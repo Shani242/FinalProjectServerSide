@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/users');
-const Cost = require('../models/costs');
+const User = require('../models/user');
+const Cost = require('../models/cost');
 
 /**
  * @module routes/users
