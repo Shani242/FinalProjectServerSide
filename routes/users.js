@@ -1,47 +1,29 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('../models/user');
-const Cost = require('../models/cost');
-
-/**
- * @module routes/users
- *
- * This module defines the user-related API routes for retrieving user details and total expenses.
- */
+const User = require("../models/user");
+const Cost = require("../models/cost");
 
 /**
  * GET /api/users/:id
- * @description Retrieves user details and their total expenses.
- * @route {GET} /api/users/:id
- * @param {Object} req - Express request object.
- * @param {Object} req.params - Request parameters.
- * @param {number} req.params.id - The user ID to fetch.
- * @param {Object} res - Express response object.
- * @returns {Object} JSON object containing user details including first name, last name, ID, and total expenses.
- * @throws {404} If the user is not found.
- * @throws {500} If an internal server error occurs.
+ * Retrieves user details and total expenses
  */
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
 
-        // Fetch user by `id`
         const user = await User.findOne({ id: userId });
-
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "User not found" });
         }
 
-        // Fetch all costs related to the user
         const costs = await Cost.find({ userid: userId });
-
-        console.log("User Found:", user); // Debugging log to verify user object
+        const totalCost = costs.reduce((sum, cost) => sum + cost.sum, 0);
 
         res.status(200).json({
             id: user.id,
             first_name: user.first_name,
             last_name: user.last_name,
-            total: costs.reduce((sum, cost) => sum + cost.sum, 0)
+            total: totalCost,
         });
     } catch (err) {
         res.status(500).json({ error: "Internal Server Error", details: err.message });
